@@ -6,7 +6,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from pathlib import Path
 from urllib.parse import urlparse, unquote
-import time
 import requests
 
 downloads_path = str(Path.home() / "Downloads")
@@ -17,6 +16,13 @@ options = webdriver.ChromeOptions()
 prefs = {"download.default_directory": path_to_download}
 options.add_experimental_option("prefs", prefs)
 driver = webdriver.Chrome(options)
+
+def delete_downloaded_bundle_id():
+   with open(csv_file, encoding='utf-8') as rf, open("myfile.csv.temp", "w", encoding='utf-8') as wf:
+    for i, line in enumerate(rf):
+        if i != 1:
+            wf.write(line)
+   os.replace("myfile.csv.temp", csv_file)
 
 def check_if_exist(by, selector):
    try:
@@ -72,7 +78,7 @@ def download_files(bundle_id):
       list_architectures = WebDriverWait(driver, 20).until(
          EC.element_to_be_clickable((By.XPATH, '//*[@id="apkcombo-tab"]/div'))
       )
-      li_list = list_architectures.find_elements(By.TAG_NAME, "ul")
+      li_list = list_architectures.find_elements(By.CSS_SELECTOR, ".tree>ul")
    except:
       return
 
@@ -87,9 +93,10 @@ def download_files(bundle_id):
       filename = os.path.basename(file.path)
       filename = unquote(filename)
       wget(href, f'{path_to_download}/{link[1]}_{filename.replace(':', '_')}')
-      with open('downloaded.csv', 'a',newline='') as file:
+      with open('downloaded.csv', 'a', newline='', encoding='utf-8') as file:
          writer = csv.writer(file)
          writer.writerow([bundle_id, f'{link[1]}_{filename.replace(':', '_')}'])
+      file.close()
 
 
 def main():
@@ -105,5 +112,6 @@ def main():
 
    for id in bundle_ids:
       download_files(id)
+      delete_downloaded_bundle_id()
 
 main()
