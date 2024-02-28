@@ -14,6 +14,7 @@ csv_file = "output.csv"
 
 options = webdriver.ChromeOptions()
 prefs = {"download.default_directory": path_to_download}
+options.add_experimental_option('excludeSwitches', ['enable-logging'])
 options.add_experimental_option("prefs", prefs)
 driver = webdriver.Chrome(options)
 
