@@ -54,13 +54,6 @@ def get_apk_links_list(list):
         return li_arr
 
 
-def file_exists(path):
-    def _predicate(_):
-        return Path(path).is_file()
-
-    return _predicate
-
-
 def wget(url, output_file):
     try:
         response = requests.get(url)
