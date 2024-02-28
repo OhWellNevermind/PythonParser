@@ -1,5 +1,8 @@
-Відкрити зі скриптом у VS Code
-Відкрити термінал і прописати команду - pip install -r requirements.txt
-Зайти в файл index.py
-Змінити зміну csv_file на назву свого csv файлу
-Зайти у VS Code у скрипт і запустити комбінацією клавіш Ctrl + F5
+-Відкрити файл зі скриптом у VS Code
+-Відкрити термінал і прописати команди
+    1)python.exe -m pip install --upgrade pip(у разі ерорки прописати python.exe -m pip install --user --upgrade pip)
+    2)pip install -r requirements.txt
+-Замінити файл output.csv на свій csv файл
+-Зайти в файл index.py
+-Змінити зміну csv_file на назву свого csv файлу(13 рядок коду)
+-У терміналі прописати команду python index.py

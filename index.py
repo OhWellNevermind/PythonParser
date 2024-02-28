@@ -93,8 +93,10 @@ def download_files(bundle_id):
       file = urlparse(href)
       filename = os.path.basename(file.path)
       filename = unquote(filename)
+      print('Намагаюсь отримати файл')
       wget(href, f'{path_to_download}/{link[1]}_{filename.replace(':', '_')}')
       with open('downloaded.csv', 'a', newline='', encoding='utf-8') as file:
+         print('Записую файл')
          writer = csv.writer(file)
          writer.writerow([bundle_id, f'{link[1]}_{filename.replace(':', '_')}'])
       file.close()
