@@ -29,14 +29,6 @@ def delete_downloaded_bundle_id():
     os.replace("myfile.csv.temp", csv_file)
 
 
-def check_if_exist(by, selector):
-    try:
-        driver.find_element(by, selector)
-        return True
-    except:
-        return False
-
-
 def get_bundle_ids():
     ids = []
     with open(csv_file, newline="", encoding="utf-8") as csvfile:
