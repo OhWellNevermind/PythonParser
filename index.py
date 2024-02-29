@@ -29,7 +29,6 @@ def get_all_csv_files():
 def create_apk_folder(csv_filename):
     csv_apk_folder_path = os.path.join(path_to_download, csv_filename)
     is_folder_exist = os.path.exists(csv_apk_folder_path)
-    print(is_folder_exist)
     if is_folder_exist:
         return csv_apk_folder_path
     else:
@@ -139,10 +138,13 @@ def main():
     for csv_file in csv_files:
         if not csv_file.__contains__(".git"):
             csv_filename = os.path.splitext(os.path.basename(csv_file))[0]
-            apk_download_to_path = create_apk_folder(csv_filename)
-            bundle_ids = get_bundle_ids(csv_file)
-            for id in bundle_ids:
-                download_files(csv_file, apk_download_to_path, id)
+            if csv_filename.__contains__("paid"):
+                continue
+            else:
+                apk_download_to_path = create_apk_folder(csv_filename)
+                bundle_ids = get_bundle_ids(csv_file)
+                for id in bundle_ids:
+                    download_files(csv_file, apk_download_to_path, id)
 
 
 main()
