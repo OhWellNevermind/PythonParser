@@ -9,8 +9,9 @@ from urllib.parse import urlparse, unquote
 import requests
 
 downloads_path = str(Path.home() / "Downloads")
-path_to_download = os.path.join(downloads_path, "apks")
-csv_file = "output.csv"
+current_dir = os.getcwd()
+path_to_download = os.path.join(current_dir, "apks")
+csv_files_path = os.path.abspath("./csv")
 
 options = webdriver.ChromeOptions()
 prefs = {"download.default_directory": path_to_download}
@@ -19,7 +20,19 @@ options.add_experimental_option("prefs", prefs)
 driver = webdriver.Chrome(options)
 
 
-def delete_downloaded_bundle_id():
+def get_all_csv_files():
+    for dirpath, _, filenames in os.walk(csv_files_path):
+        for f in filenames:
+            yield os.path.abspath(os.path.join(dirpath, f))
+
+
+def create_apk_folder(csv_filename):
+    csv_apk_folder_path = os.path.join(path_to_download, csv_filename)
+    os.mkdir(csv_apk_folder_path)
+    return csv_apk_folder_path
+
+
+def delete_downloaded_bundle_id(csv_file):
     with open(csv_file, encoding="utf-8") as rf, open(
         "myfile.csv.temp", "w", encoding="utf-8"
     ) as wf:
@@ -29,7 +42,7 @@ def delete_downloaded_bundle_id():
     os.replace("myfile.csv.temp", csv_file)
 
 
-def get_bundle_ids():
+def get_bundle_ids(csv_file):
     ids = []
     with open(csv_file, newline="", encoding="utf-8") as csvfile:
         reader = csv.DictReader(csvfile)
@@ -48,7 +61,8 @@ def get_apk_links_list(list):
             href = link.find_element(By.TAG_NAME, "a").get_attribute("href")
             if extension == "APK":
                 li_arr.append([href, arch])
-    except:
+    except Exception as e:
+        print(f"Щось сталося під час парсингу посилань на файли: ErrorString: {str(e)}")
         return li_arr
     finally:
         return li_arr
@@ -67,19 +81,24 @@ def wget(url, output_file):
         print(f"Помилка під час завантаження: {str(e)}")
 
 
-def download_files(bundle_id):
+def download_files(csv_file, download_to, bundle_id):
     try:
         driver.get(f"https://apkcombo.com/downloader/#package={bundle_id}")
+    except:
+        print("Не зміг відкрити посилання")
+    try:
         list_architectures = WebDriverWait(driver, 20).until(
             EC.element_to_be_clickable((By.XPATH, '//*[@id="apkcombo-tab"]/div'))
         )
         li_list = list_architectures.find_elements(By.CSS_SELECTOR, ".tree>ul")
     except:
+        print("Не зміг знайти DOM елемент з файлами")
         return
 
     links_list = get_apk_links_list(li_list)
 
     if len(links_list) == 0:
+        print("Посилань на завантаження файлів не знайдено")
         return
 
     for link in links_list:
@@ -88,28 +107,37 @@ def download_files(bundle_id):
         filename = os.path.basename(file.path)
         filename = unquote(filename)
         print("Намагаюсь отримати файл")
-        wget(href, f'{path_to_download}/{link[1]}_{filename.replace(":", "_")}')
+        try:
+            wget(href, f'{download_to}/{link[1]}_{filename.replace(":", "_")}')
+        except:
+            print("Не зміг завантажити файл по посиланню")
+            return
         with open("downloaded.csv", "a", newline="", encoding="utf-8") as file:
             print("Записую файл")
             writer = csv.writer(file)
-            writer.writerow([bundle_id, f'{link[1]}_{filename.replace(":", "_")}'])
+            try:
+                writer.writerow([bundle_id, f'{link[1]}_{filename.replace(":", "_")}'])
+            except Exception as e:
+                print(f"Помилка при записі файлу. ErrorString: {str(e)}")
         file.close()
+    delete_downloaded_bundle_id(csv_file)
 
 
 def main():
-    is_folder_exist = os.path.exists(path_to_download)
-    with open("downloaded.csv", "w", newline="") as file:
-        writer = csv.writer(file)
-        writer.writerow(["bundle_id", "filename"])
+    is_downloaded_exist = os.path.exists(current_dir, "downloaded.csv")
+    if not is_downloaded_exist:
+        with open("downloaded.csv", "w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(["bundle_id", "filename"])
 
-    if not is_folder_exist:
-        os.makedirs(path_to_download)
-
-    bundle_ids = get_bundle_ids()
-
-    for id in bundle_ids:
-        download_files(id)
-        delete_downloaded_bundle_id()
+    csv_files = get_all_csv_files()
+    for csv_file in csv_files:
+        if not csv_file.__contains__(".git"):
+            csv_filename = os.path.splitext(os.path.basename(csv_file))[0]
+            apk_download_to_path = create_apk_folder(csv_filename)
+            bundle_ids = get_bundle_ids(csv_file)
+            for id in bundle_ids:
+                download_files(csv_file, apk_download_to_path, id)
 
 
 main()
