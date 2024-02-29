@@ -28,8 +28,13 @@ def get_all_csv_files():
 
 def create_apk_folder(csv_filename):
     csv_apk_folder_path = os.path.join(path_to_download, csv_filename)
-    os.mkdir(csv_apk_folder_path)
-    return csv_apk_folder_path
+    is_folder_exist = os.path.exists(csv_apk_folder_path)
+    print(is_folder_exist)
+    if is_folder_exist:
+        return csv_apk_folder_path
+    else:
+        os.mkdir(csv_apk_folder_path)
+        return csv_apk_folder_path
 
 
 def delete_downloaded_bundle_id(csv_file):
@@ -124,7 +129,7 @@ def download_files(csv_file, download_to, bundle_id):
 
 
 def main():
-    is_downloaded_exist = os.path.exists(current_dir, "downloaded.csv")
+    is_downloaded_exist = os.path.exists(os.path.join(current_dir, "downloaded.csv"))
     if not is_downloaded_exist:
         with open("downloaded.csv", "w", newline="") as file:
             writer = csv.writer(file)
