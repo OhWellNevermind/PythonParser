@@ -19,7 +19,11 @@ pip install -r requirements.txt
 ```
 
 3. Закинути свої csv файли в папку csv
-4. У терміналі прописати команду python index.py
+4. У терміналі прописати команду
+
+```
+python index.py
+```
 
 # ВАЖЛИВО!!!
 
