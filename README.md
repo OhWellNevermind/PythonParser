@@ -27,4 +27,5 @@ python index.py
 
 # ВАЖЛИВО!!!
 
-### Парсер працює тільки на Windows
+### Парсер працює на Windows та Linux
+
