@@ -8,6 +8,7 @@ from pathlib import Path
 from urllib.parse import urlparse, unquote
 import requests
 
+
 downloads_path = str(Path.home() / "Downloads")
 current_dir = os.getcwd()
 path_to_download = os.path.join(current_dir, "apks")
@@ -36,14 +37,17 @@ def create_apk_folder(csv_filename):
         return csv_apk_folder_path
 
 
-def delete_downloaded_bundle_id(csv_file):
-    with open(csv_file, encoding="utf-8") as rf, open(
-        "myfile.csv.temp", "w", encoding="utf-8"
-    ) as wf:
-        for i, line in enumerate(rf):
-            if i != 1:
-                wf.write(line)
-    os.replace("myfile.csv.temp", csv_file)
+def delete_downloaded_bundle_id(csv_file, bundle_id):
+    rows_keep = []
+    with open(csv_file, "r", encoding="utf-8") as f:
+        reader = csv.reader(f)
+        print(bundle_id)
+        rows_keep = [row for row in reader if not row[5].__contains__(bundle_id)]
+
+    with open(csv_file, "w", newline="", encoding="utf-8") as wrt:
+        writer = csv.writer(wrt)
+        for row in rows_keep:
+            writer.writerow(row)
 
 
 def get_bundle_ids(csv_file):
@@ -91,7 +95,7 @@ def download_files(csv_file, download_to, bundle_id):
     except:
         print("Не зміг відкрити посилання")
     try:
-        list_architectures = WebDriverWait(driver, 20).until(
+        list_architectures = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, '//*[@id="apkcombo-tab"]/div'))
         )
         li_list = list_architectures.find_elements(By.CSS_SELECTOR, ".tree>ul")
@@ -124,7 +128,7 @@ def download_files(csv_file, download_to, bundle_id):
             except Exception as e:
                 print(f"Помилка при записі файлу. ErrorString: {str(e)}")
         file.close()
-    delete_downloaded_bundle_id(csv_file)
+    delete_downloaded_bundle_id(csv_file, bundle_id)
 
 
 def main():
