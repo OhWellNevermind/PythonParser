@@ -132,7 +132,7 @@ def download_files(csv_file, download_to, bundle_id):
 
 
 def main():
-    is_downloaded_exist = os.path.exists(os.path.join(current_dir, "downloaded.csv"))
+    is_downloaded_exist = os.path.exists(current_dir, "downloaded.csv")
     if not is_downloaded_exist:
         with open("downloaded.csv", "w", newline="") as file:
             writer = csv.writer(file)
