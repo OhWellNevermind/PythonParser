@@ -90,8 +90,11 @@ def handle_no_downloads(csv_file, download_to, bundle_id):
     except:
         print("Не вийшло знайти елемент")
 
-    file = urlparse(href)
-    filename = unquote(os.path.basename(file.path))
+    try:
+        file = urlparse(href)
+        filename = unquote(os.path.basename(file.path))
+    except:
+        return
     try:
         wget(href, f'{download_to}/{filename.replace(":", "_")}')
     except:
