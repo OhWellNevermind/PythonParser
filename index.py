@@ -73,7 +73,7 @@ def handle_no_downloads(csv_file, download_to, bundle_id):
         print("Не зміг відкрити посилання")
         return
     try:
-        generate_link_elem = WebDriverWait(driver, 10).until(
+        generate_link_elem = WebDriverWait(driver, 40).until(
             EC.element_to_be_clickable(
                 (By.XPATH, "/html/body/div[3]/div[1]/div/div/div[2]/button[1]")
             )
@@ -84,7 +84,7 @@ def handle_no_downloads(csv_file, download_to, bundle_id):
         return
     try:
         href = (
-            WebDriverWait(driver, 10)
+            WebDriverWait(driver, 40)
             .until(
                 EC.element_to_be_clickable(
                     (By.XPATH, "/html/body/div[3]/div[1]/div/div/div[2]/a")
@@ -122,8 +122,9 @@ def download_files(csv_file, download_to, bundle_id):
     except:
         print("Не зміг відкрити посилання")
         return
+
     try:
-        list_architectures = WebDriverWait(driver, 10).until(
+        list_architectures = WebDriverWait(driver, 40).until(
             EC.element_to_be_clickable((By.XPATH, '//*[@id="apkcombo-tab"]/div'))
         )
         li_list = list_architectures.find_elements(By.CSS_SELECTOR, ".tree>ul")
@@ -172,7 +173,10 @@ def main():
     csv_files = cp.get_all_csv_files()
     for csv_file in csv_files:
         if not csv_file.__contains__(".git"):
+            csv_file_path = os.path.abspath(csv_file)
+            csv_filename_with_ext = os.path.basename(csv_file)
             csv_filename = os.path.splitext(os.path.basename(csv_file))[0]
+
             if csv_filename.__contains__("paid"):
                 continue
             else:
@@ -180,6 +184,12 @@ def main():
                 bundle_ids = cp.get_bundle_ids(csv_file)
                 for id in bundle_ids:
                     download_files(csv_file, apk_download_to_path, id)
+                os.replace(
+                    csv_file_path,
+                    os.path.join(
+                        current_dir, "apks", csv_filename, csv_filename_with_ext
+                    ),
+                )
 
 
 main()

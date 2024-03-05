@@ -15,7 +15,12 @@ def delete_downloaded_bundle_id(csv_file, bundle_id):
     with open(csv_file, "r", encoding="utf-8") as f:
         reader = csv.reader(f)
         print(bundle_id)
-        rows_keep = [row for row in reader if not row[5].__contains__(bundle_id)]
+        for row in reader:
+            print(row)
+        try:
+            rows_keep = [row for row in reader if not row[5].__contains__(bundle_id)]
+        except:
+            return
 
     with open(csv_file, "w", newline="", encoding="utf-8") as wrt:
         writer = csv.writer(wrt)
