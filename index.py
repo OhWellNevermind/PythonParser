@@ -7,8 +7,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from pathlib import Path
 from urllib.parse import urlparse, unquote
+from fake_useragent import UserAgent
 import requests
 
+ua = UserAgent()
+user_agent = ua.random
 
 downloads_path = str(Path.home() / "Downloads")
 current_dir = os.getcwd()
@@ -19,6 +22,8 @@ options = webdriver.ChromeOptions()
 prefs = {"download.default_directory": path_to_download}
 options.add_experimental_option("excludeSwitches", ["enable-logging"])
 options.add_experimental_option("prefs", prefs)
+options.add_argument("start-maximized")
+options.add_argument(f"--user-agent={user_agent}")
 driver = webdriver.Chrome(options)
 
 
