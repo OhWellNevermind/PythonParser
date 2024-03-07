@@ -14,12 +14,18 @@ def delete_downloaded_bundle_id(csv_file, bundle_id):
     rows_keep = []
     with open(csv_file, "r", encoding="utf-8") as f:
         reader = csv.reader(f)
-        print(bundle_id)
-        for row in reader:
-            print(row)
+        csv_list = list(reader)
+        bundle_index = csv_list[0].index("bundle id")
+        rows_keep = []
         try:
-            rows_keep = [row for row in reader if not row[5].__contains__(bundle_id)]
-        except:
+            for row in csv_list:
+                if (
+                    row[bundle_index] == "bundle id"
+                    or row[bundle_index].split("/")[3] != bundle_id
+                ):
+                    rows_keep.append(row)
+        except Exception as e:
+            print(str(e))
             return
 
     with open(csv_file, "w", newline="", encoding="utf-8") as wrt:
