@@ -29,3 +29,4 @@ python index.py
 
 ### Парсер працює на Windows та Linux
 
+If venv is used, to activate pyenv `source ./.venv/bin/activate`

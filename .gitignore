@@ -1,3 +1,5 @@
 *.csv
 .vscode
 apks
+.venv/
+__pycache__/
